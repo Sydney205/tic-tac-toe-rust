@@ -65,7 +65,7 @@ fn main() {
             let index = string_to_num(index.clone());
 
             if index < 1 || index > 9 || board[index - 1] != ' ' {
-                println!("\x1b[91mInvalid entry\nTry again\x1b[0m");
+                println!("\n\x1b[91mInvalid move\nTry again\x1b[0m\n");
                 continue;
             }
 
@@ -81,7 +81,7 @@ fn main() {
 
             println!("Rust is thinking...");
 
-            // Sleep for 3 seconds to simulate AI thinking
+            // Sleep for 3 seconds
             let d = Duration::from_secs(3);
             thread::sleep(d);
 
@@ -182,18 +182,33 @@ fn string_to_num(s: String) -> usize {
     s.trim().parse().unwrap_or(0)
 }
 
-// Rust AI Difficulty levels...
 
+// Rust AI Difficulty levels...
 fn hard_rust(a: &Vec<usize>, b: [char; 9], player_is_x: bool) -> usize {
+    let human = if player_is_x { 'X' } else { 'O' };
     let hor_ver_arr = [1, 3, 5, 7]; // Defense cells
     let dia_arr = [0, 2, 6, 8]; // Attack cells
 
-    if b.iter().filter(|&&cell| cell == 'X').count() == 1 && player_is_x {
+    if b.iter().filter(|&&cell| cell == 'X').count() == 1 && player_is_x && b[4] == ' ' {
         return 4;
+    } else if b.iter().filter(|&&cell| cell == 'X').count() == 1 && player_is_x && b[4] != ' ' {
+        let result = rand::thread_rng().gen_range(0..hor_ver_arr.len());
+        return dia_arr[result];
+    } else {
+        return mid_rust(a, b, player_is_x);
     }
 
     if b.iter().filter(|&&cell| cell == 'O').count() == 1 && player_is_x {
         let result = rand::thread_rng().gen_range(0..hor_ver_arr.len());
+
+        for &i in a {
+            let mut test_board = b.clone();
+            test_board[i] = human;
+    
+            if check_game(test_board, human) {
+                return i;
+            }
+        }
         return hor_ver_arr[result];
     }
 
@@ -217,8 +232,7 @@ fn mid_rust(a: &Vec<usize>, b: [char; 9], player_is_x: bool) -> usize {
     let rust = if player_is_x { 'O' } else { 'X' };
 
     for &i in a {
-        // create clone boards for testing
-        let mut test_board = b.clone();
+        let mut test_board = b.clone(); // create clone board for testing
         test_board[i] = rust;
 
         if check_game(test_board, rust) {
@@ -227,7 +241,6 @@ fn mid_rust(a: &Vec<usize>, b: [char; 9], player_is_x: bool) -> usize {
     }
 
     for &i in a {
-        // create clone boards for testing
         let mut test_board = b.clone();
         test_board[i] = human;
 
@@ -243,4 +256,3 @@ fn easy_rust(a: &Vec<usize>) -> usize {
     let result = rand::thread_rng().gen_range(0..a.len());
     a[result]
 }
-
