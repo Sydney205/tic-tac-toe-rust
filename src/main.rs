@@ -15,14 +15,16 @@ fn main() {
     // Initialize the board
     let mut board = [' '; 9];
     let mut x_is_next = true;
-    
+
     clear_screen();
 
     println!("\n Play Tic-Tac-Toe with \x1b[91mRust\x1b[0m");
 
     // Choosing difficulty level
     let rust_level = loop {
-        println!("\nChoose your Difficulty: \n\n  E(easy)\n  M(medium)\n  H(hard)\n \nMake your choice:");
+        println!(
+            "\nChoose your Difficulty: \n\n  E(easy)\n  M(medium)\n  H(hard)\n \nMake your choice:"
+        );
 
         let mut rust_level = String::new();
 
@@ -30,7 +32,11 @@ fn main() {
             .read_line(&mut rust_level)
             .expect("Unable to read line");
 
-        let rust_level: char = rust_level.trim().to_ascii_uppercase().parse().unwrap_or(' ');
+        let rust_level: char = rust_level
+            .trim()
+            .to_ascii_uppercase()
+            .parse()
+            .unwrap_or(' ');
 
         if "EMH".contains(rust_level) {
             break rust_level;
@@ -53,7 +59,8 @@ fn main() {
     clear_screen();
     display_board(board);
 
-    loop { // The game loop 
+    loop {
+        // The game loop
         let mut index = String::new();
 
         if player_turn {
@@ -69,7 +76,6 @@ fn main() {
                 println!("\x1b[91mInvalid move\nTry again\x1b[0m \n");
                 continue;
             }
-
         } else {
             let actions = rust_actions(board);
 
@@ -148,11 +154,11 @@ fn clear_screen() {
 
 // Determine available moves for Rust in the board
 fn rust_actions(b: [char; 9]) -> Vec<usize> {
-	let mut indices = Vec::new();
-	
+    let mut indices = Vec::new();
+
     for (i, cell) in b.iter().enumerate() {
-    	if *cell == ' ' {
-    	    indices.push(i)
+        if *cell == ' ' {
+            indices.push(i)
         }
     }
     indices
@@ -164,11 +170,9 @@ fn check_game(b: [char; 9], p: char) -> bool {
         [0, 1, 2], /********/
         [3, 4, 5], /* rows */
         [6, 7, 8], /********/
-        
         [0, 3, 6], /***********/
         [1, 4, 7], /* columns */
         [2, 5, 8], /***********/
-        
         [0, 4, 8], /*************/
         [2, 4, 6], /* diagonals */
     ];
@@ -189,8 +193,8 @@ fn string_to_num(s: String) -> usize {
 // Rust AI Difficulty levels...
 
 fn hard_rust(a: &Vec<usize>, b: [char; 9], player_is_x: bool) -> usize {
-	let human = if player_is_x { 'X' } else { 'O' };
-	
+    let human = if player_is_x { 'X' } else { 'O' };
+
     let hor_ver_arr = [1, 3, 5, 7]; // horizontals and verticals cells
     let dia_arr = [0, 2, 6, 8]; // diagonal cells
     let atk_cells = [0, 2, 4, 6, 8]; // Attacking cells
@@ -198,8 +202,8 @@ fn hard_rust(a: &Vec<usize>, b: [char; 9], player_is_x: bool) -> usize {
     if b.iter().filter(|&&cell| cell == 'X').count() <= 2 && player_is_x {
         if b[4] == ' ' {
             return 4;
-        } 
-        
+        }
+
         for &i in a {
             let mut test_board = b.clone();
             test_board[i] = human;
@@ -208,52 +212,50 @@ fn hard_rust(a: &Vec<usize>, b: [char; 9], player_is_x: bool) -> usize {
                 return i;
             }
         }
-        
+
         if b[4] == human {
-        	loop {
-	        	let result = rand::thread_rng().gen_range(0..dia_arr.len()); 
-	        
-	            if a.contains(&dia_arr[result]) {
-	                return dia_arr[result];
-	            } else {
-		            continue;
+            loop {
+                let result = rand::thread_rng().gen_range(0..dia_arr.len());
+
+                if a.contains(&dia_arr[result]) {
+                    return dia_arr[result];
+                } else {
+                    continue;
                 }
-             }
+            }
         }
     }
-    
 
     if b.iter().filter(|&&cell| cell == 'O').count() == 1 && player_is_x {
-    	loop {
-	        let result = rand::thread_rng().gen_range(0..hor_ver_arr.len());
-	        
-	        for &i in a {
-	            let mut test_board = b.clone();
-	            test_board[i] = human;
-	
-	            if check_game(test_board, human) {
-	                return i;
-	            }
-	        }
-	        if a.contains(&hor_ver_arr[result]) {
-	        	return hor_ver_arr[result];
-	        } else {
-	        	continue; 
-	        }
-	    }
+        loop {
+            let result = rand::thread_rng().gen_range(0..hor_ver_arr.len());
+
+            for &i in a {
+                let mut test_board = b.clone();
+                test_board[i] = human;
+
+                if check_game(test_board, human) {
+                    return i;
+                }
+            }
+            if a.contains(&hor_ver_arr[result]) {
+                return hor_ver_arr[result];
+            } else {
+                continue;
+            }
+        }
     }
-    
 
     if b.iter().filter(|&&cell| cell == 'X').count() < 2 && !player_is_x {
-    	loop {
-	        let result = rand::thread_rng().gen_range(0..hor_ver_arr.len());
-	        
-	        if a.contains(&atk_cells[result]) {
-		        return atk_cells[result];
-		    } else {
-			    continue;
+        loop {
+            let result = rand::thread_rng().gen_range(0..hor_ver_arr.len());
+
+            if a.contains(&atk_cells[result]) {
+                return atk_cells[result];
+            } else {
+                continue;
             }
-		}
+        }
     }
 
     return mid_rust(a, b, player_is_x);
