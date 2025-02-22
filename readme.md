@@ -2,7 +2,7 @@
 
 clone this repository:
 ```bash
-git clone https://github/Sydney205/tic-tac-tie-rust
+git clone https://github.com/Sydney205/tic-tac-toe-rust
 ```
 
 Build and run the code:
