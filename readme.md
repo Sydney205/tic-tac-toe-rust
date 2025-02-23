@@ -1,6 +1,6 @@
 # Rust Tic-Tac-Toe
 
-clone this repository:
+clone the repo by running:
 ```bash
 git clone https://github.com/Sydney205/tic-tac-toe-rust
 ```
